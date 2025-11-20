@@ -1,0 +1,44 @@
+# PyCharm project files.
+.idea
+
+# Compiled python modules.
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+dist*/
+build/
+*.egg-info/
+.eggs/
+*.egg
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# uv
+.uv/
+# Note: uv.lock should be committed for reproducible builds
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BinTextTools - Binary and Text Conversion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        .tool-card {
+            transition: transform 0.2s;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+        .api-endpoint {
+            font-family: 'Courier New', monospace;
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<main>
+    <div class="container py-4">
+        <div class="text-center mb-4">
+            <h1 class="display-4 text-primary mb-2">BinTextTools</h1>
+            <p class="lead text-muted">Tools for Binary and Text data conversion</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- Binary to Text Converter -->
+        <div class="card mb-4 border-0 shadow-sm tool-card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h4 mb-0">Binary to Text Converter</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    Convert binary files to text format (HEX, BASE64, ASCII, DECIMAL, BINARY).
+                </p>
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="bin2text-file-tab" data-bs-toggle="tab" data-bs-target="#bin2text-file" type="button" role="tab">Upload File</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="bin2text-text-tab" data-bs-toggle="tab" data-bs-target="#bin2text-text" type="button" role="tab">Paste Text (Base64)</button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="bin2text-file" role="tabpanel">
+                        <form id="bin2textForm" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="binFile" class="form-label fw-semibold">Binary File <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="binFile" name="file" required accept="*/*">
+                                <div class="form-text">Select a binary file to convert</div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="format" class="form-label fw-semibold">Output Format</label>
+                                    <select class="form-select" id="format" name="format" required>
+                                        <option value="HEX" selected>HEX</option>
+                                        <option value="BASE64">BASE64</option>
+                                        <option value="ASCII">ASCII</option>
+                                        <option value="DECIMAL">DECIMAL</option>
+                                        <option value="BINARY">BINARY</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="delimiter" class="form-label fw-semibold">Delimiter (Optional)</label>
+                                    <input type="text" class="form-control" id="delimiter" name="delimiter" placeholder="e.g., space, comma">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="lineCharacters" class="form-label fw-semibold">Characters per Line</label>
+                                    <input type="number" class="form-control" id="lineCharacters" name="line_characters" value="0" min="0">
+                                    <div class="form-text">0 = no line breaks</div>
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="showHeader" name="show_header" checked>
+                                    <label class="form-check-label" for="showHeader">
+                                        Include header information in output
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                Convert to Text
+                            </button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="bin2text-text" role="tabpanel">
+                        <form id="bin2textTextForm">
+                            <div class="mb-3">
+                                <label for="binTextData" class="form-label fw-semibold">Base64-encoded Binary Data <span class="text-danger">*</span></label>
+                                <textarea class="form-control font-monospace" id="binTextData" name="data" rows="8" required placeholder="Paste base64-encoded binary data here..."></textarea>
+                                <div class="form-text">Paste base64-encoded binary data to convert</div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="formatText" class="form-label fw-semibold">Output Format</label>
+                                    <select class="form-select" id="formatText" name="format" required>
+                                        <option value="HEX" selected>HEX</option>
+                                        <option value="BASE64">BASE64</option>
+                                        <option value="ASCII">ASCII</option>
+                                        <option value="DECIMAL">DECIMAL</option>
+                                        <option value="BINARY">BINARY</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="delimiterText" class="form-label fw-semibold">Delimiter (Optional)</label>
+                                    <input type="text" class="form-control" id="delimiterText" name="delimiter" placeholder="e.g., space, comma">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="lineCharactersText" class="form-label fw-semibold">Characters per Line</label>
+                                    <input type="number" class="form-control" id="lineCharactersText" name="line_characters" value="0" min="0">
+                                    <div class="form-text">0 = no line breaks</div>
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="showHeaderText" name="show_header" checked>
+                                    <label class="form-check-label" for="showHeaderText">
+                                        Include header information in output
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                Convert to Text
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text to Binary Converter -->
+        <div class="card mb-4 border-0 shadow-sm tool-card">
+            <div class="card-header bg-success text-white">
+                <h2 class="h4 mb-0">Text to Binary Converter</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    Convert text files back to binary format. Header information is auto-detected if present in the file.
+                </p>
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="text2bin-file-tab" data-bs-toggle="tab" data-bs-target="#text2bin-file" type="button" role="tab">Upload File</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="text2bin-text-tab" data-bs-toggle="tab" data-bs-target="#text2bin-text" type="button" role="tab">Paste Text</button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="text2bin-file" role="tabpanel">
+                        <form id="text2binForm" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="textFile" class="form-label fw-semibold">Text File <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="textFile" name="file" required accept=".txt,.text,.b2t,.t2b,.text2bin,.textbin">
+                                <div class="form-text">Select a text file to convert back to binary</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="header" class="form-label fw-semibold">Header (Optional)</label>
+                                <textarea class="form-control" id="header" name="header" rows="4" placeholder='JSON format: {"textFile":{"format":"HEX"}}'></textarea>
+                                <div class="form-text">JSON header with format information. Leave empty to auto-detect from file.</div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="renameFile" name="rename_file">
+                                    <label class="form-check-label" for="renameFile">
+                                        Rename file to original name from header
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                Convert to Binary
+                            </button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="text2bin-text" role="tabpanel">
+                        <form id="text2binTextForm">
+                            <div class="mb-3">
+                                <label for="textContent" class="form-label fw-semibold">Text Content <span class="text-danger">*</span></label>
+                                <textarea class="form-control font-monospace" id="textContent" name="text" rows="12" required placeholder="Paste text content here..."></textarea>
+                                <div class="form-text">Paste text content to convert back to binary</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="headerText" class="form-label fw-semibold">Header (Optional)</label>
+                                <textarea class="form-control" id="headerText" name="header" rows="4" placeholder='JSON format: {"textFile":{"format":"HEX"}}'></textarea>
+                                <div class="form-text">JSON header with format information. Leave empty to auto-detect from text.</div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="renameFileText" name="rename_file">
+                                    <label class="form-check-label" for="renameFileText">
+                                        Rename file to original name from header
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                Convert to Binary
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Documentation -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h2 class="h4 mb-0">API Documentation</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    All tools are available via REST API. Use the interactive API documentation for more details.
+                </p>
+                <div class="mb-3">
+                    <h5 class="fw-semibold">Binary to Text</h5>
+                    <div class="api-endpoint mb-2">POST /api/bin2text</div>
+                    <p class="small text-muted">Convert binary file to text format</p>
+                </div>
+                <div class="mb-3">
+                    <h5 class="fw-semibold">Text to Binary</h5>
+                    <div class="api-endpoint mb-2">POST /api/text2bin</div>
+                    <p class="small text-muted">Convert text file back to binary format</p>
+                    <div class="api-endpoint mb-2">POST /api/text2bin/text</div>
+                    <p class="small text-muted">Convert text content (JSON body) back to binary format</p>
+                </div>
+                <div class="mb-3">
+                    <h5 class="fw-semibold">Binary to Text (Text Input)</h5>
+                    <div class="api-endpoint mb-2">POST /api/bin2text/text</div>
+                    <p class="small text-muted">Convert base64-encoded binary data (JSON body) to text format</p>
+                </div>
+                <div class="mb-3">
+                    <h5 class="fw-semibold">Health Check</h5>
+                    <div class="api-endpoint mb-2">GET /health</div>
+                    <p class="small text-muted">Check service health status</p>
+                </div>
+                <div class="mt-4">
+                    <a href="/docs" class="btn btn-info" target="_blank">View Interactive API Docs</a>
+                    <a href="/redoc" class="btn btn-outline-info" target="_blank">View ReDoc</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+<script>
+    function showAlert(type, message) {
+        const alertContainer = document.getElementById('alertContainer');
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        alertContainer.appendChild(alertDiv);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+
+    function downloadFile(blob, filename) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
+
+    // Binary to Text Form
+    document.getElementById('bin2textForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const spinner = submitButton.querySelector('.spinner-border');
+        
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch('/api/bin2text', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                throw new Error(errorData.detail || `HTTP ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = 'output.txt';
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            downloadFile(blob, filename);
+            showAlert('success', 'File converted successfully! Download started.');
+            form.reset();
+        } catch (error) {
+            showAlert('danger', `Error: ${error.message}`);
+        } finally {
+            submitButton.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    });
+
+    // Text to Binary Form
+    document.getElementById('text2binForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const spinner = submitButton.querySelector('.spinner-border');
+        
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch('/api/text2bin', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                throw new Error(errorData.detail || `HTTP ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = 'output.bin';
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            downloadFile(blob, filename);
+            showAlert('success', 'File converted successfully! Download started.');
+            form.reset();
+        } catch (error) {
+            showAlert('danger', `Error: ${error.message}`);
+        } finally {
+            submitButton.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    });
+
+    // Binary to Text Text Form
+    document.getElementById('bin2textTextForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const spinner = submitButton.querySelector('.spinner-border');
+        
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+
+        const formData = {
+            data: document.getElementById('binTextData').value,
+            format: document.getElementById('formatText').value,
+            delimiter: document.getElementById('delimiterText').value || null,
+            line_characters: parseInt(document.getElementById('lineCharactersText').value) || 0,
+            show_header: document.getElementById('showHeaderText').checked
+        };
+        
+        try {
+            const response = await fetch('/api/bin2text/text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                throw new Error(errorData.detail || `HTTP ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = 'output.txt';
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            downloadFile(blob, filename);
+            showAlert('success', 'Text converted successfully! Download started.');
+            form.reset();
+        } catch (error) {
+            showAlert('danger', `Error: ${error.message}`);
+        } finally {
+            submitButton.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    });
+
+    // Text to Binary Text Form
+    document.getElementById('text2binTextForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const spinner = submitButton.querySelector('.spinner-border');
+        
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+
+        const formData = {
+            text: document.getElementById('textContent').value,
+            header: document.getElementById('headerText').value || null,
+            rename_file: document.getElementById('renameFileText').checked
+        };
+        
+        try {
+            const response = await fetch('/api/text2bin/text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                throw new Error(errorData.detail || `HTTP ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = 'output.bin';
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            downloadFile(blob, filename);
+            showAlert('success', 'Text converted successfully! Download started.');
+            form.reset();
+        } catch (error) {
+            showAlert('danger', `Error: ${error.message}`);
+        } finally {
+            submitButton.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    });
+</script>
+</body>
+</html>
+
